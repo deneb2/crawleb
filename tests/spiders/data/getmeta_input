@@ -1,0 +1,7 @@
+{"content":"<html><head><meta property=\"prova\" content=\"prova\" /></head></html>", "name":"prova"}
+{"content":"<html><head><meta http-equiv=\"prova\" content=\"prova\" /></head></html>", "name":"prova"}
+{"content":"<html><head><meta name=\"prova\" content=\"prova\" /></head></html>", "name":"prova"}
+{"content":"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">", "name":"Content-Type"}
+{"content":"", "name":"summary"}
+{"content":"<meta name=\"twitter:card\" content=\"summary\"/>", "name":"twitter:card"}
+{"content":"<meta name=\"twitter:domain\" content=\"stackoverflow.com\"/>", "name":"twitter:domain"}

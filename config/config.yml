@@ -1,0 +1,47 @@
+# configuration for crawleb
+# default configuration is under the 'test' environment
+# it is possible to add multiple environment with different settings
+# the setting can be specified when starting the job.
+# test is ayway the default option.
+test:
+    crawler:
+        # realtime option enable the possibility to have a further list
+        # where the crawler push all the new urls fetched
+        # can be usefull for menaging the crawled data in realtime.
+        # Another process can pop from this queue to get new data.
+        realtime: False
+        queues:
+            # refetching-delay specify the time after which an url will
+            # be refetched. Depending on the refetching strategy this time can
+            # be increased or decreased while the joob is running using
+            # different feature.
+            refetching-delay: 86400
+
+        output:
+            # type option specify where the crawled data will be stored.
+            # there are differet options:
+            # json -- data is stored in a json file. it requires the
+            #         filename to be specified as well
+            #         example:
+            #           type: json
+            #           filename: output.json
+            # redis -- data will be stored in redis. Duplicates are updated
+            #          this choice can consume a lot of RAM.
+            # mongodb -- data will be stored in mongodb. Dumplicate are updated
+            type: mongodb
+
+        # mongodb endpoint settings
+        mongodb:
+            host: localhost
+            port: 27017
+            db: crawled
+
+        # redis endpoint settings
+        redis:
+            host: localhost
+            port: 6379
+            db: 5
+
+    logging:
+        # logging path
+        path: crawleb.log

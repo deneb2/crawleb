@@ -1,0 +1,5 @@
+www.ecommerce.com	1111111111	13	alternatives=["www.ecommerce.com"]
+www.url.com	2222222222	2	alternatives=["www.url2.com", "www.url3.com", "www.url.com"]
+www.page.com	3333333333	0	alternatives=["www.url2.com"]
+www.example.com	4444444444	1	alternatives=["www.url2.com"]
+www.website.com	5555555555	22	alternatives=["www.url2.com"]

@@ -1,0 +1,13 @@
+{"url":"http://www.url.com/1", "depth": "1"}
+{"url":"http://www.url.com/1", "depth": "0"}
+{"url":"http://www.url.com/2", "depth": "5"}
+{"url":"http://www.url.com/3", "depth": "4"}
+{"url":"http://www.url.com/4", "depth": "6"}
+{"url":"http://www.url.com/5", "depth": "2"}
+{"url":"http://www.url.com/6", "depth": "4"}
+{"url":"http://www.notallowed.com/7", "depth": "1"}
+{"url":"http://www.url.com/8", "depth": "2"}
+{"url":"http://www.notallowed.com/9", "depth": "3"}
+{"url":"http://www.url.com/10", "depth": "3"}
+{"url":"http://www.url.com/11", "depth": "5"}
+{"url":"http://www.url.com/1", "depth": "3"}
