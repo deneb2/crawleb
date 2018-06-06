@@ -1,5 +1,7 @@
 # Crawleb - a news crawler
 
+[![Build Status](https://travis-ci.org/deneb2/crawleb.svg?branch=master)](https://travis-ci.org/deneb2/crawleb)
+
 **Crawleb** is a crawler initially designed to crawl news. It can be used for any website.
 
 ## Why Crawleb
@@ -10,7 +12,7 @@ This project started just for fun and it has been tested just for small crawling
 Any advice, suggestion and collaboration is highly appreciated.
 
 ## Installation
-**Crawleb** require redis and mongodb to work. Furtermore some python dependencies are required.
+**Crawleb** require python2.7, redis and mongodb to work. Furtermore some python dependencies are required.
 
 Installation provided is for Ubuntu Linux, but it should be easy to install it everywhere.
 

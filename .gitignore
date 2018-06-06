@@ -4,3 +4,4 @@
 **.pyc
 .*
 !.gitignore
+!.travis.yml
