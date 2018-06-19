@@ -24,7 +24,7 @@ def spiders_loader():
             if inspect.ismodule(module):
                 for name, obj in inspect.getmembers(module):
                     # we do not want the base spider class
-                    if name != "BaseSpider":
+                    if name != "BaseSpider" and name.endswith("Spider"):
                         if inspect.isclass(obj):
                             class_ = getattr(module, name)
                             instance = class_()
