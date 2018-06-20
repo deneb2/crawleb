@@ -143,14 +143,14 @@ class BaseSpider(object):
         if any([True for ex in self.exclude_pages if re.match(ex, url)]):
             logging.warning("skip URL because page excluded: {}".format(url))
             return url, True
+        domain = self.get_domain(url)
+        if all([ad!=domain for ad in self.allowed_domains]):
+            logging.warning(" DOMAIN ({}) discarded: {}".format(domain, url))
+            return url, True
         nurl = self.normalize_url(url)
         if nurl != url:
             logging.warning("URL normlized: {} to {}".format(url, nurl))
             return nurl, True
-        domain = self.get_domain(url)
-        if all([ad!=domain for ad in self.allowed_domains]):
-            logging.warning(" DOMAIN ({}) discarded: {}".format(domain, nurl))
-            return url, True
         return url, False
     
     def get_domain(self, url):
