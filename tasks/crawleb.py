@@ -50,7 +50,7 @@ def main(args):
 
     logger.info("Configuration read!")
 
-    spiders = spiders_loader()
+    spiders = spiders_loader(args.spiders)
 
     # starting one process for each spider
     processes = []
@@ -71,5 +71,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", "--environment", default="test",
                         help="select the configuration environment")
+    parser.add_argument("-s", "--spiders", nargs='+', default=None,
+                        help="specify a list of spiders to use. Default all")
 
     main(parser.parse_args())
