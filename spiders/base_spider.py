@@ -254,7 +254,6 @@ class BaseSpider(object):
         data.domain = self.get_domain(nurl)
 
         # INFO: updating meta info
-        dmeta.alternatives.append(nurl)
         dmeta.url = nurl
         dmeta.dhash = data.dhash
         canonical = self.get_canonical(self.root)
