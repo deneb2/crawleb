@@ -35,6 +35,7 @@ def fetch(headers, doc_metadata, wait_on_fail = 600):
             doc_metadata.response = requests_wrapper.requests_retry_session(headers) \
                                                     .get(doc_metadata.url)
             doc_metadata.status = Status.Success
+            return doc_metadata
         except (requests.exceptions.TooManyRedirects,
                 requests.exceptions.HTTPError,
                 requests.exceptions.Timeout,
