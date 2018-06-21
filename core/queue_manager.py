@@ -134,7 +134,7 @@ class QueueManager():
             else:
                 item = self.refetch_store.pop(int(time.time()))
                 if item:
-                    logging.debug("Get Refetch:" + str(item[0]))
+                    logging.debug("Get Refetch:" + str(item[1]))
                     document_metadata.url = item[1]
                     document_metadata.depth = item[3]
                     document_metadata.delay = item[2]
