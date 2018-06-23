@@ -59,7 +59,7 @@ class Crawler():
 
         while not GracefulKiller.kill_now:
             dmeta = self.queue.pop()
-            if dmata.url:
+            if dmeta.url:
                 # in case of changing spider filters it is better to recheck
                 nurl, toremove = self.spider.check_and_normalize(dmeta.url)
                 if toremove:
@@ -73,18 +73,21 @@ class Crawler():
                 dmeta = fetcher.fetch(self.spider.headers, dmeta)
 
                 if dmeta.status == fetcher.Status.ConnectionError:
-                    # CHECK: there were some other signals before. check if this is
-                    #        still correct
+                    # CHECK: check if this is still correct
                     self.queue.add_seen_and_reschedule(dmeta)
-
                 elif dmeta.response:
-                    r_url = self.spider.normalize_url(dmeta.response.url)
-                    dmeta.alternatives.append(r_url)
-
-                    document, dmeta = self.spider.parse(dmeta)
-
-                    self.queue.add_normal_urls(dmeta)
-
-                    self.documentStore.store(document)
-                    self.queue.add_seen_and_reschedule(dmeta)
+                    if dmeta.response.status_code == 404:
+                        # removing 404 urls from output and seen
+                        # TODO: should be configurable.
+                        self.documentStore.delete(document)
+                        # INFO: maybe good to maintain urls in `seen` to not refetch
+                        # them in the future
+                        # self.queue.remove_seen(dmeta.url)
+                    else:
+                        r_url = self.spider.normalize_url(dmeta.response.url)
+                        dmeta.alternatives.append(r_url)
+                        document, dmeta = self.spider.parse(dmeta)
+                        self.queue.add_normal_urls(dmeta)
+                        self.documentStore.store(document)
+                        self.queue.add_seen_and_reschedule(dmeta)
             self.sleep.wait(self.spider.delay)

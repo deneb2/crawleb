@@ -5,10 +5,15 @@ from redis_queues import RedisHash
 from mongodb_datastore import MongoDB
 from utils.helpers import canonize
 
+
 class StandardStore():
     """Output to stdout."""
     def store(self, data):
         print data.info
+
+    def delete(self, data):
+        # is not possible to delete from stdin or a file
+        pass
 
 
 class JsonStore(StandardStore):
@@ -31,6 +36,9 @@ class RedisStore(StandardStore):
     def store(self, data):
         self.db.add(canonize(data.url), data.info)
 
+    def delete(self, data):
+        self.db.delete(canonize(data.url))
+
 
 class MongoDBStore(StandardStore):
     """Output to Mongodb."""
@@ -39,3 +47,6 @@ class MongoDBStore(StandardStore):
 
     def store(self, data):
         self.db.add(canonize(data.url), data.info)
+
+    def delete(self, data):
+        self.db.delete(canonize(data.url))
