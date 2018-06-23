@@ -3,7 +3,7 @@ import json
 
 from redis_queues import RedisHash
 from mongodb_datastore import MongoDB
-
+from utils.helpers import canonize
 
 class StandardStore():
     """Output to stdout."""
@@ -29,7 +29,7 @@ class RedisStore(StandardStore):
         self.db = RedisHash(name + "-output", host, port, db)
 
     def store(self, data):
-        self.db.add(data.url, data.info)
+        self.db.add(canonize(data.url), data.info)
 
 
 class MongoDBStore(StandardStore):
@@ -38,4 +38,4 @@ class MongoDBStore(StandardStore):
         self.db = MongoDB(name + "-output", host, port, db)
 
     def store(self, data):
-        self.db.add(data.url, data.info)
+        self.db.add(canonize(data.url), data.info)

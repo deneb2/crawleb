@@ -1,5 +1,4 @@
 """ Manage the urls seen during drawling"""
-import urllib
 from sets import Set
 
 from bs4 import BeautifulSoup
@@ -8,30 +7,13 @@ from simhash import hamming_distance
 from databases.redis_queues import RedisPageHash
 from databases.mongodb_datastore import MongoDBPageHash
 from core.metadata import DocumentMetadata
+from utils.helpers import canonize
 
 # TODO: this can be parametrized
 # hash similarity is used to modify refetch strategy
 # if the documents hash change is below this constant then
 # is considered ad not changed
 SIMILARITY_THRESHOLD = 3L
-
-def canonize(u):
-    """
-    Transform urls in a canonized form.
-
-    In seen we store canonized urls to better recognize the same url in different forms.
-    """
-    u = u.rstrip("/")
-    if u.startswith("https://"):
-        u = u[8:]
-    elif u.startswith("http://"):
-        u = u[7:]
-    try:
-        u = urllib.quote(u)
-    except:
-        pass
-        #todo: add logger
-    return u
 
 
 class SeenManager():
