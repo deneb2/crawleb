@@ -91,6 +91,8 @@ class BaseTestClass(unittest.TestCase):
     def store_temporary(self, string):
         if not self._temp_fd:
             self._open_temporary()
+        if isinstance(string, list):
+            string.sort()
         self._temp_fd.write("%s\n" %(string,))
 
     def assertEqualTemporary(self):
