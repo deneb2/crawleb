@@ -8,7 +8,14 @@ HALF_HOUR = 1800
 HOUR = HALF_HOUR * 2
 
 class BaseRefetchingStrategy():
-    '''Basic strategy to compute the date to refectch next'''
+    '''
+    Basic strategy to compute the date to refectch next
+    mechanism:
+      - priority url are refetched any start_delay seconds
+      - the other urls are refetched after refetching_delay
+        if the content changes the delay will be halved
+        if the content doesn't change delay will be doubled
+    '''
     def __init__(self, start_delay, refetching_delay):
         self.start_delay = start_delay
         self.refetching_delay = refetching_delay

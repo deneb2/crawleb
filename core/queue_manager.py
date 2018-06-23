@@ -4,6 +4,7 @@ import logging
 
 from databases.redis_queues import RedisNormalQueue, RedisPriorityQueue
 from schedulers.base_scheduler import BaseRefetchingStrategy
+from schedulers.news_scheduler import NewsRefetchingStrategy
 from core.seen_manager import SeenManager
 from core.metadata import DocumentMetadata, Source
 
@@ -14,8 +15,17 @@ class QueueManager():
         self.logger = logging.getLogger(queue)
         self.start_delay = start_delay
         refetching_delay = cfg['queues']['refetching-delay']
-        self.refetching_strategy = BaseRefetchingStrategy(self.start_delay,
-                                                          refetching_delay)
+
+        self.refetching_strategy = None
+        strategy = cfg['queues'].get('refetching-strategy')
+        if not strategy or strategy == 'base':
+            self.refetching_strategy = BaseRefetchingStrategy(self.start_delay,
+                                                              refetching_delay)
+        elif strategy == 'news':
+            self.refetching_strategy = NewsRefetchingStrategy(self.start_delay,
+                                                              refetching_delay)
+        else:
+            raise NotImplementedError("refetching strategy can be either `news` or `base`")
 
         redis_config = cfg["redis"]
         mongodb_config = cfg["mongodb"]
@@ -63,7 +73,7 @@ class QueueManager():
 
         if doc_meta.source == Source.priority:
             self.priority_store.push((expire, doc_meta.url, next_delay, doc_meta.depth), expire)
-        else:
+        elif next_delay:
             self.refetch_store.push((expire, doc_meta.url, next_delay, doc_meta.depth), expire)
         
     def add_normal_urls(self, dm):

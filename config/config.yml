@@ -13,10 +13,15 @@ test:
         queues:
             # refetching-delay specify the time after which an url will
             # be refetched. Depending on the refetching strategy this time can
-            # be increased or decreased while the joob is running using
+            # be increased or decreased while the job is running using
             # different feature.
-            refetching-delay: 86400
-
+            # Read the specific strategy documentation
+            refetching-delay: 14400
+            # two strategies are supported: news or base
+            # check out the files under scheduler directory for more info
+            # INFO: it is possible to change strategy by the time but during transition,
+            #       it is possible that refetching times are not as expected.
+            refetching-strategy: news
         output:
             # type option specify where the crawled data will be stored.
             # there are differet options:
