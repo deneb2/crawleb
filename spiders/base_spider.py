@@ -122,7 +122,8 @@ class BaseSpider(object):
             logging.error("error replacing query in url %s" %(e,))
 
         normalized = urldefrag(urlunparse(u))[0]
-        normalized = normalized.rstrip("/")
+        # INFO: not removing trailing slash to avoid too many redirections
+        # normalized = normalized.rstrip("/")
         return normalized
 
     def get_tree_dom(self, content):
