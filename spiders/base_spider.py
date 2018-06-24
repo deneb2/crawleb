@@ -65,7 +65,12 @@ class BaseSpider(object):
     # is important to setup user-aget at least
     headers = {
     }
-    
+
+    # In the case the encoding is missing in the header, we use a default option
+    # TODO: in the future is possible to use also the content of the page to infer encoding,
+    #       it is anyway a good to have option since each spider should be used for a single website.
+    default_encoding = "utf-8"
+
     ## END OF CUSTOMIZABLE OPTIONS
     ## you shouldn't change the following
     #####################################
@@ -238,6 +243,8 @@ class BaseSpider(object):
         # INFO: using the response url as a primary url
         nurl = self.normalize_url(dmeta.response.url)
         data.url = nurl
+        if not dmeta.response.encoding:
+            dmeta.response.encoding = self.default_encoding
         data.raw_html = dmeta.response.content.decode(dmeta.response.encoding, "ignore")
         data.fetched_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M")
         data.status = dmeta.response.status_code
