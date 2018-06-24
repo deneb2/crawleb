@@ -42,7 +42,7 @@ def fetch(headers, doc_metadata, wait_on_fail = 600):
                 requests.exceptions.InvalidSchema) as e:
             logging.warning("%s - Skip URL" %str(e))
             doc_metadata.status = Status.SkipUrl
-            return None
+            return doc_metadata
         except requests.ConnectionError as e:
             logging.error("%s  - Fail (%d of %d)\n" %(str(e), fail_counter, MAX_RETRIES))
             sleep.wait(wait_on_fail * fail_counter)
@@ -51,5 +51,5 @@ def fetch(headers, doc_metadata, wait_on_fail = 600):
         except Exception, e:
             logging.error("Generic server error. %s - " %str(e))
             doc_metadata.status = Status.GenericError
-            return None
+            return doc_metadata
     return doc_metadata
