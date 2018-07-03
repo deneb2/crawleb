@@ -76,18 +76,11 @@ class Crawler():
                     # CHECK: check if this is still correct
                     self.queue.add_seen_and_reschedule(dmeta)
                 elif dmeta.response:
-                    if dmeta.response.status_code == 404:
-                        # removing 404 urls from output and seen
-                        # TODO: should be configurable.
-                        self.documentStore.delete(document)
-                        # INFO: maybe good to maintain urls in `seen` to not refetch
-                        # them in the future
-                        # self.queue.remove_seen(dmeta.url)
-                    else:
-                        r_url = self.spider.normalize_url(dmeta.response.url)
-                        dmeta.alternatives.append(r_url)
-                        document, dmeta = self.spider.parse(dmeta)
-                        self.queue.add_normal_urls(dmeta)
-                        self.documentStore.store(document)
-                        self.queue.add_seen_and_reschedule(dmeta)
+                    r_url = self.spider.normalize_url(dmeta.response.url)
+                    dmeta.alternatives.append(r_url)
+                    document, dmeta = self.spider.parse(dmeta)
+                    self.queue.add_normal_urls(dmeta)
+                    # INFO: in case of status != 200 previous data will not be overwrited
+                    self.documentStore.store(document)
+                    self.queue.add_seen_and_reschedule(dmeta)
             self.sleep.wait(self.spider.delay)

@@ -37,8 +37,10 @@ class BaseRefetchingStrategy():
             # url is new or without previous delay -> init delay
             next_delay = self.refetching_delay
             
-        elif not is_changed:
+        elif not is_changed or (doc_meta.response and
+                                doc_meta.response.status_code != 200):
             # url is not changed -> doubling the delay
+            # status is not 200  -> doubling the delay
             next_delay = doc_meta.delay * 2
             
         else:

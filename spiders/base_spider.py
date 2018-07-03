@@ -249,12 +249,6 @@ class BaseSpider(object):
         data.fetched_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M")
         data.status = dmeta.response.status_code
 
-        history = []
-        for h in dmeta.response.history:
-            history.append({"status": h.status_code, "url": h.url})
-        if history:
-            data.history = history
-
         text = self.root.get_text().lower()
         cleaned_text = re.split(r'[^\w]+', text)
         doc_hash = fingerprint(map(hash, cleaned_text))
