@@ -10,7 +10,6 @@ from tests.test_base import BaseTestClass, ordered
 
 
 class TestDocumentStore(BaseTestClass):
-
     def test_standardstore(self):
         input = self.input_data()
         output = ds.StandardStore()
