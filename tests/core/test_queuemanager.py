@@ -10,6 +10,7 @@ from freezegun import freeze_time
 from core.queue_manager import QueueManager
 from core.metadata import DocumentMetadata, Source
 from tests.test_base import BaseTestClass
+from utils.helpers import TWO_HOURS
 
 # a fixed time usefull for some tests
 CURRENT_TIME = "2018-05-31"
@@ -31,6 +32,13 @@ CONFIGURATION = {
     "redis":REDISMONGOCONF,
     "mongodb":REDISMONGOCONF
 }
+CONFIGURATION_NEWS = {
+    'queues':{'refetching-delay':10, 'refetching-strategy':'news'},
+    "realtime": False,
+    "redis":REDISMONGOCONF,
+    "mongodb":REDISMONGOCONF
+}
+
 START_DELAY = 2
 
 
@@ -318,7 +326,6 @@ class TestQueueManager(BaseTestClass):
 
 
 class TestQueueRescheduling(BaseTestClass):
-
     @mock.patch('redis.StrictRedis', mock_strict_redis_client)
     @mock.patch('pymongo.MongoClient')
     def setUp(self, mc):
@@ -494,6 +501,194 @@ class TestQueueRescheduling(BaseTestClass):
         self.assertEqual(refetching_data.delay,
                          START_DELAY)
         self.assertEqual(refetching_data.source, Source.priority)
+
+
+class TestNewsQueueRescheduling(BaseTestClass):
+    @mock.patch('redis.StrictRedis', mock_strict_redis_client)
+    @mock.patch('pymongo.MongoClient')
+    def setUp(self, mc):
+        super(TestNewsQueueRescheduling, self).setUp()
+        mc.return_value = mongomock.MongoClient()
+
+        self.qm = QueueManager("queues-names", START_DELAY, CONFIGURATION_NEWS)
+        ############################
+        # insert some urls into seen
+        dm_seen_1 = DocumentMetadata("http://www.randomurl1.it")
+        # this two are cosidered the same page with different urls
+        dm_seen_1.alternatives = [
+            "http://www.randomurl1.it",
+            "http://www.randomurl3.it",
+        ]
+        dm_seen_1.dhash = 12345
+        dm_seen_2 = DocumentMetadata("http://www.randomurl4.it")
+        dm_seen_2.alternatives = [
+            "http://www.randomurl4.it",
+        ]
+        dm_seen_2.dhash = 98765
+        already_seen_urls = set(dm_seen_1.alternatives).union(dm_seen_2.alternatives)
+        self.qm.seen.add(dm_seen_1)
+        self.qm.seen.add(dm_seen_2)
+        self.qm.seen.incr_n(dm_seen_1.url) # increase counter to check it later
+        counter = self.qm.seen.get(dm_seen_1.url).get("count")
+        self.assertEqual(counter, 2)
+
+    @freeze_time(CURRENT_TIME)
+    def test_reschedule_samecontent(self):
+        ############################################
+        # testing rescheduling some urls
+        # this one is in seen with the same hash and
+        # not taken from priority queue
+        # I expect: doublig the delay and set seen counter to 1
+        dm = DocumentMetadata("http://www.randomurl1.it")
+        dm.depth = 1
+        dm.dhash = 12345
+        dm.source = Source.normal
+        dm.delay = 10
+        # alternatives contains always at least one url.
+        dm.alternatives = [
+            "http://www.randomurl1.it"
+        ]
+        # we want to check that former alternatives are also correctly
+        # updated even if new alternatives field is different.
+        alternatives = self.qm.seen.get(dm.url).get("alternatives")
+        self.assertNotEqual(len(dm.alternatives), len(alternatives))
         
+        self.qm.add_seen_and_reschedule(dm)
+
+        # check all the parameters
+        counter = self.qm.seen.get(dm.url).get("count")
+        dhash = self.qm.seen.get(dm.url).get("page_hash")
+        self.assertEqual(counter, 1)
+
+        # check updated all the alternatives
+        for urls in alternatives:
+             counter = self.qm.seen.get(urls).get("count")
+             dhash = self.qm.seen.get(dm.url).get("page_hash")
+             self.assertEqual(counter, 1)
+             self.assertEqual(dhash, dm.dhash)
+
+        with mock.patch("time.time", mock_time):
+            refetching_data = self.qm.pop()
+        self.assertEqual(refetching_data.delay, dm.delay*2)
+        self.assertEqual(refetching_data.source, Source.refetch)
+
+    @freeze_time(CURRENT_TIME)
+    def test_reschedule_samecontent_lastdelay(self):
+        ############################################
+        # testing rescheduling some urls
+        # this one is in seen with the same hash and
+        # not taken from priority queue
+        # I expect: doublig the delay and set seen counter to 1
+        dm = DocumentMetadata("http://www.randomurl1.it")
+        dm.depth = 1
+        dm.dhash = 12345
+        dm.source = Source.normal
+        dm.delay = 40
+        # alternatives contains always at least one url.
+        dm.alternatives = [
+            "http://www.randomurl1.it"
+        ]
+        # we want to check that former alternatives are also correctly
+        # updated even if new alternatives field is different.
+        alternatives = self.qm.seen.get(dm.url).get("alternatives")
+        self.assertNotEqual(len(dm.alternatives), len(alternatives))
+        
+        self.qm.add_seen_and_reschedule(dm)
+
+        # check all the parameters
+        counter = self.qm.seen.get(dm.url).get("count")
+        dhash = self.qm.seen.get(dm.url).get("page_hash")
+        self.assertEqual(counter, 1)
+
+        # check updated all the alternatives
+        for urls in alternatives:
+             counter = self.qm.seen.get(urls).get("count")
+             dhash = self.qm.seen.get(dm.url).get("page_hash")
+             self.assertEqual(counter, 1)
+             self.assertEqual(dhash, dm.dhash)
+
+        with mock.patch("time.time", mock_time):
+            refetching_data = self.qm.pop()
+        self.assertEqual(refetching_data.url, "")
+        self.assertEqual(refetching_data.source, Source.unknown)
+
+    @freeze_time(CURRENT_TIME)
+    def test_reschedule_different_content(self):
+        ############################################
+        # this one is in seen with a different hash and
+        # not taken from priority queue
+        # I expect: halving the delay and set seen counter to 1
+        dm = DocumentMetadata("http://www.randomurl1.it")
+        dm.depth = 1
+        dm.dhash = 1936
+        dm.source = Source.normal
+        dm.delay = 20
+        dm.alternatives = [
+            "http://www.randomurl1.it"
+        ]
+
+        self.qm.add_seen_and_reschedule(dm)
+
+        # checking all the parameters
+        counter = self.qm.seen.get(dm.url).get("count")
+        dhash = self.qm.seen.get(dm.url).get("page_hash")
+        self.assertEqual(counter, 1)
+        self.assertEqual(dhash, dm.dhash)
+        with mock.patch("time.time", mock_time):
+            refetching_data = self.qm.pop()
+        self.assertEqual(refetching_data.delay, dm.delay/2)
+        self.assertEqual(refetching_data.source, Source.refetch)
+
+    @freeze_time(CURRENT_TIME)
+    def test_reschedule_newurl(self):
+        ############################################
+        # inserting a new url
+        dm = DocumentMetadata("http://www.randomurl8.it")
+        dm.depth = 1
+        dm.dhash = 121212
+        dm.source = Source.normal
+        dm.alternatives = [
+            "http://www.randomurl8.it"
+        ]
+
+        self.qm.add_seen_and_reschedule(dm)
+
+        # checking all the parameters
+        counter = self.qm.seen.get(dm.url).get("count")
+        dhash = self.qm.seen.get(dm.url).get("page_hash")
+        self.assertEqual(counter, 1)
+        self.assertEqual(dhash, dm.dhash)
+        with mock.patch("time.time", mock_time):
+            refetching_data = self.qm.pop()
+        
+        self.assertEqual(refetching_data.delay, TWO_HOURS)
+        self.assertEqual(refetching_data.source, Source.refetch)
+
+    @freeze_time(CURRENT_TIME)
+    def test_reschedule_priority(self):
+        ############################################
+        # inserting a priority url
+        dm = DocumentMetadata("http://www.randomurl8.it")
+        dm.depth = 1
+        dm.dhash = 121212
+        dm.source = Source.priority
+        dm.delay = 500
+        dm.alternatives = [
+            "http://www.randomurl8.it"
+        ]
+
+        self.qm.add_seen_and_reschedule(dm)
+
+        # checking all the parameters
+        counter = self.qm.seen.get(dm.url).get("count")
+        dhash = self.qm.seen.get(dm.url).get("page_hash")
+        self.assertEqual(counter, 1)
+        self.assertEqual(dhash, dm.dhash)
+        with mock.patch("time.time", mock_time):
+            refetching_data = self.qm.pop()
+        
+        self.assertEqual(refetching_data.delay, START_DELAY)
+        self.assertEqual(refetching_data.source, Source.priority)
+
 if __name__ == "__main__":
     unittest.main()
