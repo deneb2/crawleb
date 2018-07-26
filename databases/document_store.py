@@ -42,7 +42,7 @@ class HashStore(StandardStore):
         the history maintain anyway the last 10 status and dates.
         '''
         data_old = self.db.get(canonize(data.url))
-        if data.status == 200:
+        if data.status == 200 or not data_old:
             data.history = [(data.fetched_time, data.status)]
             if data_old:
                 data.history += data_old["history"][:9]
