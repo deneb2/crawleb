@@ -14,7 +14,7 @@ class MongoDB(object):
 
     def add(self, url, data):
         try:
-            self.table.update_one({"_id":url}, {"$set": data}, upsert=True)
+            self.table.replace_one({"_id":url}, data, upsert=True)
         except DocumentTooLarge:
             self.logger.warning("Document too large: Skip Document: %s" %url)
 
