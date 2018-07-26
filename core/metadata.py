@@ -26,3 +26,5 @@ class DocumentMetadata(object):
         self.response = None
 
         self.status = None
+
+        self.spider = ""

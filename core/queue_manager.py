@@ -66,7 +66,7 @@ class QueueManager():
         is_changed = self.seen.is_changed(doc_meta.url, doc_meta.dhash)
         
         if self.realtime and (is_new or is_changed):
-            self.realtime_queue.push(doc_meta.url, int(time.time()))
+            self.realtime_queue.push({"url":doc_meta.url, "name":doc_meta.spider}, int(time.time()))
 
         self.seen.add(doc_meta)
         expire, next_delay = self.refetching_strategy.compute(doc_meta, is_new, is_changed)

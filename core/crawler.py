@@ -59,6 +59,7 @@ class Crawler():
 
         while not GracefulKiller.kill_now:
             dmeta = self.queue.pop()
+            dmeta.spider = self.spider.name
             if dmeta.url:
                 # in case of changing spider filters it is better to recheck
                 nurl, toremove = self.spider.check_and_normalize(dmeta.url)
