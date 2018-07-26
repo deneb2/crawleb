@@ -8,12 +8,16 @@ class Document(object):
       self.raw_html = entries.get("raw_html", "")
       
       self.blocked = entries.get("blocked", False)
-      
-      self.fetched_time = entries.get("fetched_time", "")
-      
-      self.status = entries.get("status", 0)
-      
+
       self.history = entries.get("history", [])
+      try:
+         self.fetched_time = self.history[0][0]
+         self.status = self.history[0][1]
+      except:
+         # checking fetcher_time and status for historical reason
+         self.fetched_time = entries.get("fetched_time", "")
+         self.status = entries.get("status", 0)
+
       
       self.dhash = entries.get("hash", 0)
       
