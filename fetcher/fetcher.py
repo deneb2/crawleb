@@ -1,6 +1,4 @@
 """Implementation of a url fetcher function"""
-import re
-import sys
 import logging
 import requests
 import threading
@@ -18,7 +16,8 @@ class Status():
     SkipUrl = 300
     GenericError = 100
 
-def fetch(headers, doc_metadata, wait_on_fail = 600):
+
+def fetch(headers, doc_metadata, wait_on_fail=600):
     '''
     Fetch the url specified on doc_metadata. Return updated metadata.
 
@@ -40,16 +39,16 @@ def fetch(headers, doc_metadata, wait_on_fail = 600):
                 requests.exceptions.HTTPError,
                 requests.exceptions.Timeout,
                 requests.exceptions.InvalidSchema) as e:
-            logging.warning("%s - Skip URL" %str(e))
+            logging.warning("%s - Skip URL" % str(e))
             doc_metadata.status = Status.SkipUrl
             return doc_metadata
         except requests.ConnectionError as e:
-            logging.error("%s  - Fail (%d of %d)\n" %(str(e), fail_counter, MAX_RETRIES))
+            logging.error("%s  - Fail (%d of %d)\n" % (str(e), fail_counter, MAX_RETRIES))
             sleep.wait(wait_on_fail * fail_counter)
             fail_counter += 1
             doc_metadata.status = Status.ConnectionError
-        except Exception, e:
-            logging.error("Generic server error. %s - " %str(e))
+        except Exception as e:
+            logging.error("Generic server error. %s - " % str(e))
             doc_metadata.status = Status.GenericError
             return doc_metadata
     return doc_metadata

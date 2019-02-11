@@ -1,6 +1,7 @@
 """Test spider."""
 from spiders.base_spider import BaseSpider
 
+
 class TestSpider(BaseSpider):
     """
     Spider just for test.

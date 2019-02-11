@@ -21,8 +21,8 @@ from spiders.document import Document
 
 class BaseSpider(object):
     '''The base spider defines default function for crawling and parsing'''
-    ## The following are some options that can be cusomized on new spiders ##
-    ## It is highly recommended to not change the values here but on the new derived classes ##
+    # The following are some options that can be cusomized on new spiders ##
+    # It is highly recommended to not change the values here but on the new derived classes ##
     ###########################################################################################
     # empty allowed_domains means all domains allowed (be carefull)
     allowed_domains = []
@@ -71,8 +71,8 @@ class BaseSpider(object):
     #       it is anyway a good to have option since each spider should be used for a single website.
     default_encoding = "utf-8"
 
-    ## END OF CUSTOMIZABLE OPTIONS
-    ## you shouldn't change the following
+    # END OF CUSTOMIZABLE OPTIONS
+    # you shouldn't change the following
     #####################################
 
     robotparser_cache = {}
@@ -81,7 +81,7 @@ class BaseSpider(object):
     def get_canonical(self, root):
         """Retrieve eventually the canonical url."""
         if self.use_canonical:
-            canonical = root.find('link', {"rel":"canonical"}, href=True)
+            canonical = root.find('link', {"rel": "canonical"}, href=True)
             if canonical:
                 url = canonical.get("href")
                 url = self.normalize_url(url)
@@ -103,10 +103,10 @@ class BaseSpider(object):
                        and url not in self.start_urls:
                         self.urllist.append(json_obj)
             except Exception as e:
-                logger.warning(str(e) +
-                               "File specified by urllist does not exist;"
-                               "This parameter is not mandatory;"
-                               "Please delete or fix this configuration.")
+                logging.warning(str(e) +
+                                "File specified by urllist does not exist;"
+                                "This parameter is not mandatory;"
+                                "Please delete or fix this configuration.")
 
     def normalize_url(self, url):
         """
@@ -123,8 +123,8 @@ class BaseSpider(object):
             query = sorted(query.items())
         try:
             u = u._replace(query=urlencode(query, True))
-        except Exception, e:
-            logging.error("error replacing query in url %s" %(e,))
+        except Exception as e:
+            logging.error("error replacing query in url %s" % (e,))
 
         normalized = urldefrag(urlunparse(u))[0]
         # INFO: not removing trailing slash to avoid too many redirections
@@ -150,7 +150,7 @@ class BaseSpider(object):
             logging.warning("skip URL because page excluded: {}".format(url))
             return url, True
         domain = self.get_domain(url)
-        if all([ad!=domain for ad in self.allowed_domains]):
+        if all([ad != domain for ad in self.allowed_domains]):
             logging.warning(" DOMAIN ({}) discarded: {}".format(domain, url))
             return url, True
         nurl = self.normalize_url(url)
@@ -168,7 +168,7 @@ class BaseSpider(object):
         if root is not None:
             attributes = ["name", "property", "http-equiv"]
             for attr in attributes:
-                data = root.find("meta", {attr:name})
+                data = root.find("meta", {attr: name})
                 if data:
                     return data.get("content")
 
@@ -195,7 +195,7 @@ class BaseSpider(object):
         if self.nofollow_compliant is True:
             nofollow = Set(
                 [urljoin(base_url, i.get('href'))
-                 for i in soup.find_all('a', {"rel":"nofollow"}, href=True)]
+                 for i in soup.find_all('a', {"rel": "nofollow"}, href=True)]
             )
             links = [l for l in links if l not in nofollow]
 
@@ -204,15 +204,15 @@ class BaseSpider(object):
         for l in links:
             domain = self.get_domain(l)
             if len(self.allowed_domains) == 0 or domain in self.allowed_domains:
-                l = self.normalize_url(l)
-                if [True for ex in self.exclude_pages if re.match(ex, l)]:
+                norm_l = self.normalize_url(l)
+                if [True for ex in self.exclude_pages if re.match(ex, norm_l)]:
                     continue
                 rb = None
                 domains.add(domain)
                 if self.robots_compliant:
                     rb = self.robotparser_cache.get(domain)
-                    
-                    if rb == None:
+   
+                    if rb is None:
                         rb = robotparser.RobotFileParser()
                         # TODO: fix this
                         rb.set_url("http://" + domain + "/robots.txt")
@@ -220,13 +220,13 @@ class BaseSpider(object):
                         self.robotparser_cache[domain] = rb
 
                 # INFO: this try-catch is here because sometimes
-	        #                  can_fatch returns unicode problems. It seemd
-	        #                  to be a bug of the library though.
-	        ################################################################
+                #       can_fatch returns unicode problems. It seemd
+                #       to be a bug of the library though.
+                ################################################################
                 try:
                     # TODO: ho messo l'* perche' non so  lo user-agent qui per ora
-                    if not rb or rb.can_fetch("*", l):
-                        allowed_links.add(l)
+                    if not rb or rb.can_fetch("*", norm_l):
+                        allowed_links.add(norm_l)
 
                 except KeyError:
                     pass

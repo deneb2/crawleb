@@ -27,16 +27,16 @@ REDISMONGOCONF = {
     'db': 'test',
 }
 CONFIGURATION = {
-    'queues':{'refetching-delay':3},
+    'queues': {'refetching-delay': 3},
     "realtime": False,
-    "redis":REDISMONGOCONF,
-    "mongodb":REDISMONGOCONF
+    "redis": REDISMONGOCONF,
+    "mongodb": REDISMONGOCONF
 }
 CONFIGURATION_NEWS = {
-    'queues':{'refetching-delay':10, 'refetching-strategy':'news'},
+    'queues': {'refetching-delay': 10, 'refetching-strategy': 'news'},
     "realtime": False,
-    "redis":REDISMONGOCONF,
-    "mongodb":REDISMONGOCONF
+    "redis": REDISMONGOCONF,
+    "mongodb": REDISMONGOCONF
 }
 
 START_DELAY = 2
@@ -156,7 +156,7 @@ class TestQueueManager(BaseTestClass):
         # adding a duplicate that is already in seen.
         # should not be added in normal list, but counters of
         # all alternatives shouls be updated (+1)
-        dm.links = [dm.links[0],]
+        dm.links = [dm.links[0], ]
         qm.add_normal_urls(dm)
         stored = qm.normal_store.getall()
         for i in dm_seen_1.alternatives:
@@ -166,7 +166,7 @@ class TestQueueManager(BaseTestClass):
         # adding again with different depth should not
         # change the behaviour
         dm.depth = 3
-        dm.links = [dm.links[0],]
+        dm.links = [dm.links[0], ]
         qm.add_normal_urls(dm)
 
         for i in dm_seen_1.alternatives:
@@ -274,7 +274,6 @@ class TestQueueManager(BaseTestClass):
 
         self.assertEqual(count, len(urls))
 
-
     @mock.patch('redis.StrictRedis', mock_strict_redis_client)
     @mock.patch('pymongo.MongoClient')
     @freeze_time(CURRENT_TIME)
@@ -312,7 +311,7 @@ class TestQueueManager(BaseTestClass):
         # make sure all the inserted url are ready to be popped
         with mock.patch("time.time", mock_time):
             doc = qm.pop()
-            #first one from priority
+            # first one from priority
             self.assertEqual(doc.depth, 0)
             self.assertEqual(doc.source, Source.priority)
             
@@ -321,7 +320,7 @@ class TestQueueManager(BaseTestClass):
             self.assertEqual(doc.source, Source.normal)
             
             doc = qm.pop()
-            #third from refetching
+            # third from refetching
             self.assertEqual(doc.source, Source.refetch)
 
 
@@ -350,7 +349,7 @@ class TestQueueRescheduling(BaseTestClass):
         already_seen_urls = set(dm_seen_1.alternatives).union(dm_seen_2.alternatives)
         self.qm.seen.add(dm_seen_1)
         self.qm.seen.add(dm_seen_2)
-        self.qm.seen.incr_n(dm_seen_1.url) # increase counter to check it later
+        self.qm.seen.incr_n(dm_seen_1.url)  # increase counter to check it later
         counter = self.qm.seen.get(dm_seen_1.url).get("count")
         self.assertEqual(counter, 2)
 
@@ -384,10 +383,10 @@ class TestQueueRescheduling(BaseTestClass):
 
         # check updated all the alternatives
         for urls in alternatives:
-             counter = self.qm.seen.get(urls).get("count")
-             dhash = self.qm.seen.get(dm.url).get("page_hash")
-             self.assertEqual(counter, 1)
-             self.assertEqual(dhash, dm.dhash)
+            counter = self.qm.seen.get(urls).get("count")
+            dhash = self.qm.seen.get(dm.url).get("page_hash")
+            self.assertEqual(counter, 1)
+            self.assertEqual(dhash, dm.dhash)
 
         with mock.patch("time.time", mock_time):
             refetching_data = self.qm.pop()
@@ -528,7 +527,7 @@ class TestNewsQueueRescheduling(BaseTestClass):
         already_seen_urls = set(dm_seen_1.alternatives).union(dm_seen_2.alternatives)
         self.qm.seen.add(dm_seen_1)
         self.qm.seen.add(dm_seen_2)
-        self.qm.seen.incr_n(dm_seen_1.url) # increase counter to check it later
+        self.qm.seen.incr_n(dm_seen_1.url)  # increase counter to check it later
         counter = self.qm.seen.get(dm_seen_1.url).get("count")
         self.assertEqual(counter, 2)
 
@@ -562,10 +561,10 @@ class TestNewsQueueRescheduling(BaseTestClass):
 
         # check updated all the alternatives
         for urls in alternatives:
-             counter = self.qm.seen.get(urls).get("count")
-             dhash = self.qm.seen.get(dm.url).get("page_hash")
-             self.assertEqual(counter, 1)
-             self.assertEqual(dhash, dm.dhash)
+            counter = self.qm.seen.get(urls).get("count")
+            dhash = self.qm.seen.get(dm.url).get("page_hash")
+            self.assertEqual(counter, 1)
+            self.assertEqual(dhash, dm.dhash)
 
         with mock.patch("time.time", mock_time):
             refetching_data = self.qm.pop()
@@ -602,10 +601,10 @@ class TestNewsQueueRescheduling(BaseTestClass):
 
         # check updated all the alternatives
         for urls in alternatives:
-             counter = self.qm.seen.get(urls).get("count")
-             dhash = self.qm.seen.get(dm.url).get("page_hash")
-             self.assertEqual(counter, 1)
-             self.assertEqual(dhash, dm.dhash)
+            counter = self.qm.seen.get(urls).get("count")
+            dhash = self.qm.seen.get(dm.url).get("page_hash")
+            self.assertEqual(counter, 1)
+            self.assertEqual(dhash, dm.dhash)
 
         with mock.patch("time.time", mock_time):
             refetching_data = self.qm.pop()
@@ -689,6 +688,7 @@ class TestNewsQueueRescheduling(BaseTestClass):
         
         self.assertEqual(refetching_data.delay, START_DELAY)
         self.assertEqual(refetching_data.source, Source.priority)
+
 
 if __name__ == "__main__":
     unittest.main()

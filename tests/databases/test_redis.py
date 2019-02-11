@@ -1,7 +1,5 @@
-import sys
 import json
 import mock
-import redis
 import unittest
 
 from mockredis import mock_strict_redis_client
@@ -17,10 +15,11 @@ class TestRedisPriority(BaseTestClass):
 
         # same data with same priority are inserted only one time
         # adding multiple eqaul entry will make the test fail
-        self.input_data = [(100, {"data":1}),
-                           (3, "data"),
-                           (192, [0, 1, 3]),
-                           (2000, "test_not_pickup")
+        self.input_data = [
+            (100, {"data": 1}),
+            (3, "data"),
+            (192, [0, 1, 3]),
+            (2000, "test_not_pickup")
         ]
 
         self.queue_name = "test"
@@ -65,11 +64,12 @@ class TestRedisNormal(BaseTestClass):
     def setUp(self):
         super(TestRedisNormal, self).setUp()
         
-        self.input_data = [(100, {"data":1}),
-                           (3, "data"),
-                           (3, "data"),
-                           (192, [0, 1, 3]),
-                           (2000, "test_not_pickup")
+        self.input_data = [
+            (100, {"data": 1}),
+            (3, "data"),
+            (3, "data"),
+            (192, [0, 1, 3]),
+            (2000, "test_not_pickup")
         ]
         self.queue_name = "test"
         self.redis_client = rq.RedisNormalQueue(self.queue_name, None, 0, 5)
@@ -81,7 +81,7 @@ class TestRedisNormal(BaseTestClass):
     def test_redis_pop(self):
         for i in self.input_data:
             # in the process of storing in redis. Types can change
-            tmp_obj = json.loads(json.dumps(i))            
+            tmp_obj = json.loads(json.dumps(i))
             self.assertEqual(self.redis_client.pop(), tmp_obj)
         self.assertIsNone(self.redis_client.pop())
 
@@ -91,11 +91,12 @@ class TestRedisHash(BaseTestClass):
     def setUp(self):
         super(TestRedisHash, self).setUp()
         
-        self.input_data = [("k", "data"),
-                           ("k1", "data"),
-                           ("k1", "data"),
-                           ("k2", "data3"),
-                           ("k3", "data4")
+        self.input_data = [
+            ("k", "data"),
+            ("k1", "data"),
+            ("k1", "data"),
+            ("k2", "data3"),
+            ("k3", "data4")
         ]
         self.queue_name = "test"
         self.redis_client = rq.RedisHash(self.queue_name, None, 0, 5)
@@ -140,11 +141,12 @@ class TestRedisPageHash(BaseTestClass):
         super(TestRedisPageHash, self).setUp()
         # keys + "test" are used to test contains == False
         # do not use key ending with 'test'
-        self.input_data = [("k", 1234, 0, "alt1"),
-                           ("k1", 1235, 1, "alt3"),
-                           ("k1", 1234, 3, "alt1"),
-                           ("k2", 1334, 4, "alt3"),
-                           ("k3", 1534, 5, "alt4"),
+        self.input_data = [
+            ("k", 1234, 0, "alt1"),
+            ("k1", 1235, 1, "alt3"),
+            ("k1", 1234, 3, "alt1"),
+            ("k2", 1334, 4, "alt3"),
+            ("k3", 1534, 5, "alt4"),
         ]
         self.queue_name = "test"
         self.redis_client = rq.RedisPageHash(self.queue_name, None, 0, 5)

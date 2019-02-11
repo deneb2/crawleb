@@ -14,18 +14,18 @@ class MongoDB(object):
 
     def add(self, url, data):
         try:
-            self.table.replace_one({"_id":url}, data, upsert=True)
+            self.table.replace_one({"_id": url}, data, upsert=True)
         except DocumentTooLarge:
-            self.logger.warning("Document too large: Skip Document: %s" %url)
+            self.logger.warning("Document too large: Skip Document: %s" % url)
 
     def getall(self):
         return self.table.find({})
 
     def delete(self, key):
-        self.table.delete_one({"_id":key})
+        self.table.delete_one({"_id": key})
 
     def get(self, key):
-        return self.table.find_one({"_id":key})
+        return self.table.find_one({"_id": key})
 
 
 class MongoDBPageHash(MongoDB):
@@ -34,7 +34,7 @@ class MongoDBPageHash(MongoDB):
         super(MongoDBPageHash, self).__init__(name, host, port, db)
 
     def __contains__(self, key):
-        if self.table.find_one({"_id":key}):
+        if self.table.find_one({"_id": key}):
             return True
         return False
 
@@ -42,12 +42,12 @@ class MongoDBPageHash(MongoDB):
         return self.table.count()
 
     def add(self, key, page_hash, count=1, alternatives=None):
-        value = {"page_hash":page_hash, "count":count}
+        value = {"page_hash": page_hash, "count": count}
         if alternatives:
             value["alternatives"] = alternatives
         # replace_one with upsert:
         # --> will replace the document if any or insert new
-        self.table.replace_one({"_id":key}, value, upsert=True)
+        self.table.replace_one({"_id": key}, value, upsert=True)
 
     def incr_n(self, key, n=1):
-        self.table.update_one({"_id":key}, {"$inc":{"count":n}})
+        self.table.update_one({"_id": key}, {"$inc": {"count": n}})

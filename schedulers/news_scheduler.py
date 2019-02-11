@@ -3,7 +3,7 @@ import time
 
 from core.metadata import Source
 from schedulers.base_scheduler import BaseRefetchingStrategy
-from utils.helpers import HALF_HOUR, HOUR, TWO_HOURS
+from utils.helpers import TWO_HOURS
 
 
 class NewsRefetchingStrategy(BaseRefetchingStrategy):
@@ -19,7 +19,7 @@ class NewsRefetchingStrategy(BaseRefetchingStrategy):
         self.start_delay = start_delay
         self.refetching_delay = refetching_delay
         # this strategy refetch after two hours and after
-        # exponentially 
+        # exponentially
         self.refetching_vector = [
             TWO_HOURS,
             refetching_delay,
@@ -29,7 +29,7 @@ class NewsRefetchingStrategy(BaseRefetchingStrategy):
         # we will remove None cases from refetching list
         self.increase_delay = {refetching_delay * 4: None}
         # on refetching we do not refetch more frequently than refetching_delay
-        self.decrease_delay = {refetching_delay:refetching_delay}
+        self.decrease_delay = {refetching_delay: refetching_delay}
         
         for i, v in enumerate(self.refetching_vector):
             if i < len(self.refetching_vector)-1:
@@ -53,7 +53,7 @@ class NewsRefetchingStrategy(BaseRefetchingStrategy):
                 # start_delay is not set. removing from priority
                 # it means we do not want to periodically refetch
                 # some specific urls
-                doc.meta.souce = Source.refetch
+                doc_meta.souce = Source.refetch
                 next_delay = self.refetching_delay
 
         elif is_new or not doc_meta.delay:
@@ -71,7 +71,7 @@ class NewsRefetchingStrategy(BaseRefetchingStrategy):
         else:
             next_delay = self.decrease_delay.get(doc_meta.delay, self.refetching_vector[2])
 
-        assert(next_delay > 0 or next_delay == None)
+        assert(next_delay > 0 or next_delay is None)
         if not next_delay:
             return None, None
 

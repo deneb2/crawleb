@@ -12,10 +12,10 @@ def ordered(obj):
     if isinstance(obj, str):
         try:
             obj = json.loads(obj)
-        except:
+        except Exception:
             try:
                 obj = eval(obj)
-            except:
+            except Exception:
                 pass
     if isinstance(obj, dict):
         return sorted((k, ordered(v)) for k, v in obj.items())
@@ -24,6 +24,7 @@ def ordered(obj):
     else:
         return obj
 
+
 class BaseTestClass(unittest.TestCase):
     _temp_fd = None
     
@@ -31,12 +32,12 @@ class BaseTestClass(unittest.TestCase):
         # create a new temporary directory
         try:
             shutil.rmtree(self._tmp_path)
-        except:
+        except Exception:
             pass
         try:
             os.makedirs(self._tmp_path)
-        except Exception, e:
-            sys.stderr.write("Impossible to create tmp directory %s\n" %(e,))
+        except Exception as e:
+            sys.stderr.write("Impossible to create tmp directory %s\n" % (e,))
             sys.exit(1)
 
     @property
@@ -60,7 +61,7 @@ class BaseTestClass(unittest.TestCase):
 
     @property
     def _tmp_path(self):
-        return '/tmp/'+ self._test_base_dir + '/data/' + self._test_name + "/"
+        return '/tmp/' + self._test_base_dir + '/data/' + self._test_name + "/"
 
     @property
     def tmp_file(self):
@@ -93,12 +94,12 @@ class BaseTestClass(unittest.TestCase):
             self._open_temporary()
         if isinstance(string, list):
             string.sort()
-        self._temp_fd.write("%s\n" %(string,))
+        self._temp_fd.write("%s\n" % (string,))
 
     def assertEqualTemporary(self):
         try:
             self._temp_fd.close()
-        except:
+        except Exception:
             pass
         output = self.output_data()
         temporary = self.temporary_data()

@@ -1,5 +1,3 @@
-import sys
-import json
 import mock
 import unittest
 import requests
@@ -14,9 +12,11 @@ class DataResponse():
         self.content = content
         self.status = status
 
+
 class MockResponse():
     def __init__(self, c, s):
         self.dr = DataResponse(c, s)
+
     def get(self, url):
         if self.dr.status == 301:
             raise requests.exceptions.TooManyRedirects
@@ -32,6 +32,7 @@ class MockResponse():
             raise Exception("testing generic exception")
         return self.dr
 
+
 class TestFetcher(BaseTestClass):
     @mock.patch("utils.requests_wrapper.requests_retry_session")
     def test_fetcher(self, session):
@@ -46,7 +47,7 @@ class TestFetcher(BaseTestClass):
             if status == 200:
                 self.assertEqual(dm.status, 0)
                 self.assertEqual(new_dm.status, 0)
-                self.assertEqual(new_dm.response.content, content)                
+                self.assertEqual(new_dm.response.content, content)
             elif status == 301:
                 self.assertEqual(dm.status, fetcher.Status.SkipUrl)
             elif status == 0:
@@ -55,6 +56,7 @@ class TestFetcher(BaseTestClass):
                 self.assertEqual(dm.status, fetcher.Status.SkipUrl)
             else:
                 self.assertEqual(dm.status, fetcher.Status.GenericError)
+
 
 if __name__ == '__main__':
     unittest.main()

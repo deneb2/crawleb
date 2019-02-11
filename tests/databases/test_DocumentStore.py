@@ -1,7 +1,5 @@
-import sys
 import json
 import mock
-import redis
 import unittest
 
 import databases.document_store as ds
@@ -35,6 +33,7 @@ class TestDocumentStore(BaseTestClass):
     @mock.patch('redis.StrictRedis.hget')
     def test_redisstore(self, mock_redis_get, mock_redis_set):
         data = {}
+
         def setter(table, key, val):
             data[key] = val
 
@@ -76,6 +75,7 @@ class TestDocumentStore(BaseTestClass):
     @mock.patch('databases.mongodb_datastore.MongoDB.get')
     def test_mongodbstore(self, mock_mongo_get, mock_mongo_set):
         data = {}
+
         def setter(key, val):
             data[key] = val
 
@@ -114,8 +114,9 @@ class TestDocumentStore(BaseTestClass):
 
     @mock.patch('databases.mongodb_datastore.MongoDB.add')
     @mock.patch('databases.mongodb_datastore.MongoDB.get')
-    def test_mongodbstore(self, mock_mongo_get, mock_mongo_set):
+    def test_mongodbstore2(self, mock_mongo_get, mock_mongo_set):
         data = {}
+
         def setter(key, val):
             data[key] = val
 
@@ -126,23 +127,26 @@ class TestDocumentStore(BaseTestClass):
         mock_mongo_get.side_effect = getter
 
         url = "www.daniele.it"
-        d1 = Document({"url": url,
-                       "status": 200,
-                       "fetched_time": "2018-01-07T02:01",
-                       "hash": 111111
-        })
+        d1 = Document(
+            {"url": url,
+             "status": 200,
+             "fetched_time": "2018-01-07T02:01",
+             "hash": 111111}
+        )
 
-        d2 = Document({"url": url,
-                       "status": 300,
-                       "fetched_time": "2018-01-08T02:01",
-                       "hash": 121212
-        })
+        d2 = Document(
+            {"url": url,
+             "status": 300,
+             "fetched_time": "2018-01-08T02:01",
+             "hash": 121212}
+        )
 
-        d3 = Document({"url": url,
-                       "status": 200,
-                       "fetched_time": "2018-01-08T02:01",
-                       "hash": 131313
-        })
+        d3 = Document(
+            {"url": url,
+             "status": 200,
+             "fetched_time": "2018-01-08T02:01",
+             "hash": 131313}
+        )
 
         output = ds.MongoDBStore("", None, 0, "void")
 
@@ -158,6 +162,7 @@ class TestDocumentStore(BaseTestClass):
         self.assertEqual(1, len(data))
         self.assertEqual(data[url]["hash"], 131313)
         self.assertEqual(len(data[url]["history"]), 3)
+
 
 if __name__ == '__main__':
     unittest.main()

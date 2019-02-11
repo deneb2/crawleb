@@ -1,14 +1,11 @@
-import sys
 import json
 import mock
-import redis
 import unittest
-
 import mongomock
 
 import databases.mongodb_datastore as mongo
-from spiders.document import Document
 from tests.test_base import BaseTestClass
+
 
 class TestMongodb(BaseTestClass):
     
@@ -55,8 +52,7 @@ class TestMongodb(BaseTestClass):
             data_dict[url] = (p_hash, int(count), alternatives)
 
         self.assertEqual(len(database), len(data_dict))
-            
-            
+
         for i in data_dict:
             self.assertTrue(i in database)
             self.assertFalse(i + "randomchar" in database)

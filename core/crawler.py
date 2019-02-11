@@ -1,17 +1,12 @@
 """Implement a crawler"""
-import re
 import logging
-import sys
 import threading
-import requests
-
-from bs4 import BeautifulSoup
 
 import databases.document_store as ds
 from utils.signals_handlers import GracefulKiller
-import utils.requests_wrapper as requests_wrapper
 import fetcher.fetcher as fetcher
 from core.queue_manager import QueueManager
+
 
 class Crawler():
     """

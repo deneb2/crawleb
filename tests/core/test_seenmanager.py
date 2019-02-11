@@ -36,14 +36,16 @@ class TestSeenManager(BaseTestClass):
         sm = SeenManager("test", "host", 0, "db")
 
         dmeta = DocumentMetadata("http://www.google.com")
-        dmeta.alternatives = ["http://www.google.com",
-                              "http://www.google2.com/",
-                              "https://www.google3.com",
+        dmeta.alternatives = [
+            "http://www.google.com",
+            "http://www.google2.com/",
+            "https://www.google3.com",
         ]
         dmeta.dhash = 2413242
 
-        other_urls = ["www.prova.com",
-                     "www.other.com",
+        other_urls = [
+            "www.prova.com",
+            "www.other.com",
         ]
         # adding urls
         sm.add(dmeta)
@@ -81,15 +83,17 @@ class TestSeenManager(BaseTestClass):
         sm = SeenManager("test", "host", 0, "db")
 
         dmeta = DocumentMetadata("http://www.google.com?q=test")
-        dmeta.alternatives = ["http://www.google.com?q=test",
-                              "http://www.google2.com/",
-                              "https://www.google3.com",
+        dmeta.alternatives = [
+            "http://www.google.com?q=test",
+            "http://www.google2.com/",
+            "https://www.google3.com",
         ]
         dmeta.dhash = 2413242
 
         dmeta2 = DocumentMetadata("http://www.google2.com")
-        dmeta2.alternatives = ["http://www.google2.com",
-                              "https://www.google3.com",
+        dmeta2.alternatives = [
+            "http://www.google2.com",
+            "https://www.google3.com",
         ]
         dmeta2.dhash = 12121212
 
@@ -118,8 +122,9 @@ class TestSeenManager(BaseTestClass):
         ]
         dmeta.dhash = 2413242
 
-        other_urls = ["www.test.com",
-                     "www.other.com",
+        other_urls = [
+            "www.test.com",
+            "www.other.com",
         ]
 
         # adding urls
@@ -176,6 +181,7 @@ class TestSeenManager(BaseTestClass):
 
         for u in dmeta.alternatives:
             self.assertTrue(sm.is_changed(u, dmeta.dhash+3))
+
 
 if __name__ == "__main__":
     unittest.main()

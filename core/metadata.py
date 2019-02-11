@@ -1,5 +1,6 @@
 """Implement datatypes to describe documents"""
 
+
 class Source():
     unknown = 0
     priority = 1

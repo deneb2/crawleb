@@ -7,6 +7,7 @@ from core.metadata import Source
 HALF_HOUR = 1800
 HOUR = HALF_HOUR * 2
 
+
 class BaseRefetchingStrategy():
     '''
     Basic strategy to compute the date to refectch next
@@ -36,7 +37,7 @@ class BaseRefetchingStrategy():
                 # start_delay is not set. removing from priority
                 # it means we do not want to periodically refatch
                 # some specific urls
-                doc.meta.souce = Source.refetch
+                doc_meta.souce = Source.refetch
                 next_delay = self.refetching_delay
 
         elif is_new or not doc_meta.delay:

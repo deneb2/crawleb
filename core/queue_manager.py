@@ -2,7 +2,7 @@
 import time
 import logging
 
-from databases.redis_queues import RedisNormalQueue, RedisPriorityQueue
+from databases.redis_queues import RedisPriorityQueue
 from schedulers.base_scheduler import BaseRefetchingStrategy
 from schedulers.news_scheduler import NewsRefetchingStrategy
 from core.seen_manager import SeenManager
@@ -47,9 +47,9 @@ class QueueManager():
                                 mongodb_config['db'])
         if self.realtime:
             self.realtime_queue = RedisPriorityQueue('realtime',
-                                        redis_config['host'],
-                                        redis_config['port'],
-                                        redis_config['db'])
+                                                     redis_config['host'],
+                                                     redis_config['port'],
+                                                     redis_config['db'])
 
     def remove_seen(self, url):
         """Remove previously seen url"""
@@ -66,7 +66,7 @@ class QueueManager():
         is_changed = self.seen.is_changed(doc_meta.url, doc_meta.dhash)
         
         if self.realtime and (is_new or is_changed):
-            self.realtime_queue.push({"url":doc_meta.url, "name":doc_meta.spider}, int(time.time()))
+            self.realtime_queue.push({"url": doc_meta.url, "name": doc_meta.spider}, int(time.time()))
 
         self.seen.add(doc_meta)
         expire, next_delay = self.refetching_strategy.compute(doc_meta, is_new, is_changed)
@@ -91,7 +91,7 @@ class QueueManager():
 
         This function is specific for the case when we have some bootstrap urls.
         """
-        #TODO: is it possible to reuse add_normal_url?
+        # TODO: is it possible to reuse add_normal_url?
         for i in json_objs:
             if self.seen.is_new(i["url"]):
                 # INFO: I add two to depth.

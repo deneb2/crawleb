@@ -3,6 +3,7 @@ import json
 import redis
 import logging
 
+
 class RedisPriorityQueue(object):
     """Implement a priority queue with redis."""
     def __init__(self, queue, rhost, rport, rdb):
@@ -26,11 +27,11 @@ class RedisPriorityQueue(object):
                     return json_obj
                 else:
                     # concurrency problem
-                    self.logger.debug("concurrent pop on redis priority queue: %s. Retrying..." %(seld.queue,))
+                    self.logger.debug("concurrent pop on redis priority queue: %s. Retrying..." % (self.queue,))
                     return self.pop(current_time)
         except IndexError:
             # Queue is empty
-            self.logger.debug("queue: %s is empty" %(self.queue,))
+            self.logger.debug("queue: %s is empty" % (self.queue,))
 
     def getall(self):
         all_json_values = []
@@ -93,14 +94,14 @@ class RedisPageHash(RedisHash):
     """
     Implement a specific type of hash map with redis.
     
-    Main difference is the presence of a counter and the possibility to 
+    Main difference is the presence of a counter and the possibility to
     incresse it.
     """
     def __init__(self, hashname, rhost, rport, rdb):
         super(RedisPageHash, self).__init__(hashname, rhost, rport, rdb)
 
-    def add(self, key, page_hash, count=1, alternatives = None):
-        value = {"page_hash":page_hash, "count":count}
+    def add(self, key, page_hash, count=1, alternatives=None):
+        value = {"page_hash": page_hash, "count": count}
         if alternatives:
             value["alternatives"] = alternatives
         self._r.hset(self.hash, key, json.dumps(value))

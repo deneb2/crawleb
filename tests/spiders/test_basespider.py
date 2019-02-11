@@ -1,24 +1,21 @@
-import sys
 import json
 import mock
-import redis
 import unittest
 
-import robotparser
-from StringIO import StringIO
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
 
-from spiders.document import Document
 import spiders.base_spider as cs
 from tests.test_base import BaseTestClass
 
 
 class FileObject():
-    data = ["User-agent: *","Allow: /"]
+    data = ["User-agent: *", "Allow: /"]
+
     def __iter__(self):
         for i in self.data:
             yield i
+
     def close(self):
         pass
 
@@ -55,7 +52,7 @@ class TestCrawlSpider(BaseTestClass):
             self.assertEqual(domain, output[c])
 
     @mock.patch('robotparser.URLopener.open')
-    def test_basegetlinks(self, opener):        
+    def test_basegetlinks(self, opener):
         opener.return_value = FileObject()
         input = self.input_data()
         spider = cs.BaseSpider()
@@ -117,7 +114,8 @@ class TestCrawlSpider(BaseTestClass):
             doc, meta = spider.parse(dm)
             self.store_temporary(json.dumps(doc.info))
         self.assertEqualTemporary()
-        
+
+
 if __name__ == '__main__':
     unittest.main()
 

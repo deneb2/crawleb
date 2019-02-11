@@ -22,9 +22,11 @@ from utils.config_reader import read_from_file
 from utils.signals_handlers import GracefulKiller
 from utils.logger_manager import log_listener, logger_configurer
 
+
 def run_spider(cfg, s):
     crawl = Crawler(s, cfg['crawler'])
     crawl.start()
+
 
 def main(args):
     config_file = "config/config.yml"
@@ -66,6 +68,7 @@ def main(args):
 
     queue.put_nowait(None)
     listener.join()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

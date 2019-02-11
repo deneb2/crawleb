@@ -38,8 +38,7 @@ class SeenManager():
         prev_alt = []
         if prev_entry:
             prev_alt = prev_entry.get("alternatives")
-            
-        
+
         canonized = [canonize(a) for a in dmeta.alternatives if a]
         canonized = list(set(canonized + prev_alt))
         for n in canonized:
